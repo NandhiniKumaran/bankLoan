@@ -1,4 +1,4 @@
-package com.demo.bank.entity;
+package com.demo.bank.dto;
 
 public enum LoanType {
     CAR, HOME;

@@ -1,71 +1,31 @@
 package com.demo.bank.dto;
 
-import com.demo.bank.entity.LoanType;
-import com.demo.bank.entity.RoleList;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class UserDto
 {
     private Long id;
-    @NotEmpty
+    @NotNull(message = "firstName should not be null")
+    @NotEmpty(message = "firstName should not be empty")
     private String firstName;
-    @NotEmpty
+    @NotNull(message = "lastName should not be null")
+    @NotEmpty(message = "lastName should not be empty")
     private String lastName;
-    @NotEmpty(message = "Email should not be empty")
-    @Email
+    @NotNull(message = "email should not be null")
+    @NotEmpty(message = "email should not be empty")
+    @Email(message = "email not in correct format")
     private String email;
-    @NotEmpty(message = "Password should not be empty")
     private String password;
-
+    private String role;
+    private String username;
     private RoleList roleList;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public RoleList getRoleList() {
-        return roleList;
-    }
-
-    public void setRoleList(RoleList roleList) {
-        this.roleList = roleList;
-    }
 }

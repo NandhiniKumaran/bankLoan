@@ -1,55 +1,71 @@
 package com.demo.bank.controller;
 
 
+import com.demo.bank.config.MessageProperties;
+import com.demo.bank.dto.LoanDto;
+import com.demo.bank.dto.LoanPaymentDetailsDto;
 import com.demo.bank.entity.Loan;
 import com.demo.bank.entity.LoanPaymentDetails;
 import com.demo.bank.service.LoanPaymentDetailsService;
 import com.demo.bank.service.LoanService;
+import com.demo.bank.service.impl.LoanPaymentDetailsServiceImpl;
+import com.demo.bank.service.impl.LoanServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-@Controller
-@RequestMapping("/loanPayment")
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/loanPayment")
 public class LoanPaymentController {
 
-    private final LoanService loanService;
-    private final LoanPaymentDetailsService loanPaymentDetailsService;
+    @Autowired
+    LoanService loanService;
+    @Autowired
+   LoanPaymentDetailsService loanPaymentDetailsService;
 
-    public LoanPaymentController(LoanService loanService, LoanPaymentDetailsService loanPaymentDetailsService) {
-        this.loanService = loanService;
-        this.loanPaymentDetailsService = loanPaymentDetailsService;
-    }
-    @Secured({"ROLE_ADMIN","ROLE_CUSTOMER"})
-    @GetMapping(value = "/new/{loanId}")
-    public String createNewCreditAccounts(LoanPaymentDetails loanPaymentDetails,@PathVariable long loanId){
-        Loan loan = loanService.getLoanById(loanId);
-        loanPaymentDetails.setLoan(loan);
+    @Autowired
+    MessageProperties messageProperties;
 
-
-        return "newPayment";
-
-    }
     @Secured({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @PostMapping(value = "/new")
-    public String createNewPayment(LoanPaymentDetails loanPaymentDetails)
+    public ResponseEntity<LoanPaymentDetailsDto> createNewPayment(@Valid @RequestBody LoanPaymentDetailsDto loanPaymentDetailsDto)
     {
-        loanPaymentDetails.setDeleted(Boolean.FALSE);
-        loanPaymentDetailsService.saveNewPayment(loanPaymentDetails);
-        return "redirect:/loan/retrieveLoan/"+loanPaymentDetails.getLoan().getCredit().getId();
+        HttpHeaders headers = new HttpHeaders();
+
+        try {
+            //loanPaymentDetails.setDeleted(Boolean.FALSE);
+            loanPaymentDetailsDto = loanPaymentDetailsService.saveNewPayment(loanPaymentDetailsDto);
+
+            headers.set("successMessage", messageProperties.getLoanPaymentSuccessResponse());
+            return ResponseEntity.created(URI.create("/api/loanPayment/new")).headers(headers).body(loanPaymentDetailsDto);
+        }catch (Exception e)
+        {
+            headers.set("failureMessage", messageProperties.getLoanPaymentFailureResponse());
+            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Secured({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping(value = "/retrievePaymentDetails/{loanId}")
-    public String retrievePaymentDetails(Model model,@PathVariable long loanId)
+    public ResponseEntity<List<LoanPaymentDetailsDto>> retrievePaymentDetails(@PathVariable long loanId)
     {
-        Loan loan=loanService.getLoanById(loanId);
-        model.addAttribute("loanPaymentDetails", loanPaymentDetailsService.findByLoan(loan));
-        return "payments";
+        try {
+            List<LoanPaymentDetailsDto> loanPaymentDetailsDtoList=loanPaymentDetailsService.findByLoanId(loanId);
+            return new ResponseEntity<>(loanPaymentDetailsDtoList,HttpStatus.OK);
+        }catch (Exception e)
+        {
+            return new ResponseEntity<>( HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 

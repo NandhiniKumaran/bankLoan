@@ -1,15 +1,12 @@
 package com.demo.bank.config;
 
-import com.demo.bank.entity.RoleList;
-import com.demo.bank.service.UserService;
+import com.demo.bank.dto.RoleList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +25,9 @@ public class SecurityConfig {
     }
 
     public static final String[] ENDPOINTS_WHITELIST = {
-            "/login",
+            "/login/**",
+            "/resources/**",
+            "/*.js",
             "/h2-console/**"
     };
 
@@ -44,7 +43,7 @@ public class SecurityConfig {
                         form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/")
+                                .defaultSuccessUrl("/default")
                                 .permitAll()
                 ).logout(
                         logout -> logout

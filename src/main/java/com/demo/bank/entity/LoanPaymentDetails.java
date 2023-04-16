@@ -1,10 +1,18 @@
 package com.demo.bank.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="LOAN_PAYMENT_DETAILS")
 public class LoanPaymentDetails {
@@ -37,83 +45,6 @@ public class LoanPaymentDetails {
     @Column(name="CREATED_BY")
     private String createdBy;
 
-
-
-    public LoanPaymentDetails() {
-    }
-
-    public LoanPaymentDetails(long paymentNo, double paidAmount, LocalDate paidDate, String remarks, Boolean isDeleted, Loan loan) {
-        this.paymentNo = paymentNo;
-        this.paidAmount = paidAmount;
-        this.paidDate = paidDate;
-        this.remarks = remarks;
-        this.isDeleted = isDeleted;
-        this.loan = loan;
-    }
-
-    public long getPaymentNo() {
-        return paymentNo;
-    }
-
-    public void setPaymentNo(long paymentNo) {
-        this.paymentNo = paymentNo;
-    }
-
-    public double getPaidAmount() {
-        return paidAmount;
-    }
-
-    public void setPaidAmount(double paidAmount) {
-        this.paidAmount = paidAmount;
-    }
-
-    public LocalDate getPaidDate() {
-        return paidDate;
-    }
-
-    public void setPaidDate(LocalDate paidDate) {
-        this.paidDate = paidDate;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public Loan getLoan() {
-        return loan;
-    }
-
-    public void setLoan(Loan loan) {
-        this.loan = loan;
-    }
-
-    public Boolean getDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        isDeleted = deleted;
-    }
-
-    public LocalDate getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDate createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
 
 
 

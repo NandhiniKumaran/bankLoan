@@ -1,58 +1,58 @@
 package com.demo.bank.controller;
 
 
-import com.demo.bank.entity.Credit;
+import com.demo.bank.config.MessageProperties;
+import com.demo.bank.dto.CreditDto;
+import com.demo.bank.entity.User;
 import com.demo.bank.service.CreditService;
+import com.demo.bank.service.impl.CreditServiceImpl;
+import com.demo.bank.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
+import java.net.URI;
+import java.util.List;
 
-@Controller
-@RequestMapping("/accounts")
+
+@RestController
+@RequestMapping("/api/accounts")
 public class CreditController {
-
-   private final CreditService creditService;
-    public CreditController(CreditService creditService) {
-        this.creditService = creditService;
-    }
-
-    @GetMapping
-    public String getAllCreditAccounts(Model model){
-        model.addAttribute("creditAccs", creditService.getAllCredits());
-        return "credit";
-    }
+    @Autowired
+     MessageProperties messageProperties;
+    @Autowired
+     UserService userService;
+    @Autowired
+    CreditService creditService;
 
     @Secured("ROLE_ADMIN")
-    @GetMapping(value = "/new")
-    public String createNewCreditAccounts(Credit credit){
-        return "newCredit";
+    @GetMapping
+    public ResponseEntity<List<CreditDto>> getAllCreditAccounts(){
+        List<CreditDto> creditDtoList=creditService.getAllCredits();
+        return new ResponseEntity<>(creditDtoList,HttpStatus.OK);
     }
 
+
+    @Secured("ROLE_ADMIN")
     @PostMapping
-    public String setNewCreditAccounts(@Valid Credit newAccount, BindingResult result, Model model) {
+    public ResponseEntity<CreditDto> createNewCreditAccounts(@Valid @RequestBody CreditDto creditDto) {
 
-        if (result.hasErrors()) {
-            return "newCredit";
+        HttpHeaders headers = new HttpHeaders();
+        User existingUser = userService.findUserByEmail(creditDto.getUser().getEmail());
+        if(existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()){
+            headers.add("failureMessage", messageProperties.getUserConflictResponse());
+            return new ResponseEntity<>(headers,HttpStatus.CONFLICT);
         }
-
-        User user =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
-        newAccount.setCreatedBy(user.getUsername());
-        newAccount.setCreatedOn(LocalDate.now());
-
-        creditService.saveNewCreditAccount(newAccount);
-        return "redirect:/accounts";
+        creditDto=creditService.saveNewCreditAccount(creditDto);
+        headers.add("successMessage", messageProperties.getAccountSuccessResponse());
+        return ResponseEntity.created(URI.create("/api/accounts")).headers(headers).body(creditDto);
     }
+
+
 }

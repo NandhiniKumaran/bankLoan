@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface LoanPaymentDetailsRepository extends JpaRepository<LoanPaymentDetails, Long> {
 
-    List<LoanPaymentDetails> findByLoanAndIsDeletedIsFalse(Loan loan);
+    List<LoanPaymentDetails> findByLoan(Loan loan);
 
 
 
