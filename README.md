@@ -1,4 +1,4 @@
-# Bank Loan
+# Bank Loan -
 This application includes Registration, Login, Create credit facility, Create and view loan under credit facility, Create and view payment under loan
 
 ## About
